@@ -8,7 +8,7 @@
 nvim --version
 ```
 
-## Clone Repo
+## Setup
 
 1. Clone github repo into `$HOME/.config/nvim`
 
@@ -18,6 +18,18 @@ nvim --version
 
 * Linters - flake8
 * Formatters - black
+
+2. Claude Code CLI Setup
+
+```sh
+npm install -g @anthropic-ai/claude-code
+```
+
+3. LLM CLI (optional)
+
+```sh
+brew install llm
+```
 
 ##  TODO
 
