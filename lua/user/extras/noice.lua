@@ -31,7 +31,21 @@ function M.config()
         view = "notify",
         filter = { event = "msg_showmode" },
       },
+      -- Hide written messages
+      {
+        filter = {
+          event = "msg_show",
+          kind = "",
+          find = "written",
+        },
+        opts = { skip = true },
+      },
     },
+  }
+
+  require("notify").setup {
+    timeout = 3500,
+    stages = "static",
   }
 end
 
