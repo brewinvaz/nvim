@@ -17,7 +17,6 @@ function M.config()
         ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
       },
     },
-    -- you can enable a preset for easier configuration
     presets = {
       bottom_search = false, -- use a classic bottom cmdline for search
       command_palette = false, -- position the cmdline and popupmenu together
@@ -25,26 +24,17 @@ function M.config()
       inc_rename = false, -- enables an input dialog for inc-rename.nvim
       lsp_doc_border = false, -- add a border to hover docs and signature help
     },
-    -- show @recording messages
     routes = {
       {
         view = "notify",
         filter = { event = "msg_showmode" },
       },
-      -- Hide written messages
-      {
-        filter = {
-          event = "msg_show",
-          kind = "",
-          find = "written",
-        },
-        opts = { skip = true },
-      },
     },
   }
 
   require("notify").setup {
-    timeout = 3500,
+    top_down = false,
+    timeout = 2500,
     stages = "static",
   }
 end

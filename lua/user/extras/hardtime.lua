@@ -4,9 +4,7 @@ local M = {
 }
 
 function M.config()
-  require("hardtime").setup {
-    timeout = 1500,
-  }
+  require("hardtime").setup()
 end
 
 return M
