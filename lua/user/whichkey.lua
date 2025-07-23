@@ -21,6 +21,7 @@ function M.config()
     { "<leader>g", group = "Git" },
     { "<leader>l", group = "LSP" },
     { "<leader>p", group = "Plugins" },
+    { "<leader>r", group = "Rest" },
     { "<leader>s", group = "Test" },
     { "<leader>t", group = "Tab" },
     { "<leader>tn", "<cmd>$tabnew<CR>", desc = "New Empty Tab" },
