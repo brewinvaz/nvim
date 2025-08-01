@@ -13,6 +13,6 @@ return {
   "svelte",
   "tailwindcss",
   "terraformls",
-  "tsserver",
+  "ts_ls",
   "yamlls",
 }
