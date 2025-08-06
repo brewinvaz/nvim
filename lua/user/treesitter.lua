@@ -29,6 +29,7 @@ function M.config()
       "make",
       "markdown",
       "markdown_inline",
+      "prisma",
       "proto",
       "python",
       "regex",
