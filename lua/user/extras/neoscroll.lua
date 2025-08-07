@@ -6,12 +6,13 @@ function M.config()
   local neoscroll = require "neoscroll"
 
   local keymap = {
-    ["<C-k>"] = function()
-      neoscroll.ctrl_u { duration = 250 }
-    end,
-    ["<C-j>"] = function()
-      neoscroll.ctrl_d { duration = 250 }
-    end,
+    -- Disabled <C-k> and <C-j> to avoid conflicts with window navigation
+    -- ["<C-k>"] = function()
+    --   neoscroll.ctrl_u { duration = 250 }
+    -- end,
+    -- ["<C-j>"] = function()
+    --   neoscroll.ctrl_d { duration = 250 }
+    -- end,
     ["<C-b>"] = function()
       neoscroll.ctrl_b { duration = 450 }
     end,
