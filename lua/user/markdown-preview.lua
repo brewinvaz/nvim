@@ -23,7 +23,7 @@ function M.config()
   local wk = require "which-key"
 
   wk.add {
-    { "<leader>m", "<cmd>MarkdownPreview<CR>", desc = "MD Preview", mode = { "n", "v", "i" } },
+    { "<leader>m", "<cmd>MarkdownPreview<CR>", desc = "MD Preview", mode = { "n", "v" } },
   }
 end
 
