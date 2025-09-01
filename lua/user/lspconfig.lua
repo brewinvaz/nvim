@@ -92,9 +92,7 @@ function M.config()
 
   vim.diagnostic.config(default_diagnostic_config)
 
-  for _, sign in ipairs(vim.tbl_get(vim.diagnostic.config() or {}, "signs", "values") or {}) do
-    vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = sign.name })
-  end
+  -- Sign definition is now handled automatically by vim.diagnostic.config()
 
   vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
   vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
@@ -102,6 +100,11 @@ function M.config()
   require("lspconfig.ui.windows").default_options.border = "rounded"
 
   for _, server in pairs(servers) do
+    -- Skip ts_ls since we're using typescript-tools
+    if server == "ts_ls" then
+      goto continue
+    end
+
     local opts = {
       on_attach = M.on_attach,
       capabilities = M.common_capabilities(),
@@ -118,6 +121,7 @@ function M.config()
     end
 
     lspconfig[server].setup(opts)
+    ::continue::
   end
 end
 

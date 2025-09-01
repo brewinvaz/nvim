@@ -13,6 +13,5 @@ return {
   "svelte",
   "tailwindcss",
   "terraformls",
-  "ts_ls",
   "yamlls",
 }

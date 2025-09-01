@@ -1,6 +1,6 @@
 return {
   settings = {
-    workingDirectory = { mode = "auto" },
+    workingDirectories = { mode = "auto" },
     format = { enable = true },
     lint = { enable = true },
   },

@@ -83,6 +83,11 @@ local M = {
       }
     end,
   },
+
+  -- EditorConfig
+  {
+    "editorconfig/editorconfig-vim",
+  },
 }
 
 return M
