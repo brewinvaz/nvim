@@ -38,7 +38,7 @@ spec "user.extras.illuminate"
 spec "user.extras.neogit"
 spec "user.extras.neoscroll"
 spec "user.extras.neotab"
--- spec "user.extras.noice"
+spec "user.extras.noice"
 spec "user.extras.oil"
 spec "user.extras.tabby"
 
