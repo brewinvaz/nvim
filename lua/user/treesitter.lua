@@ -1,5 +1,9 @@
 local M = {
   "nvim-treesitter/nvim-treesitter",
+  -- The `main` branch is the 1.0 rewrite: it drops `nvim-treesitter.configs`
+  -- and requires the `tree-sitter` CLI to install parsers. Stay on `master`
+  -- until this config is migrated to the new API.
+  branch = "master",
   event = { "BufReadPost", "BufNewFile" },
   build = ":TSUpdate",
 }

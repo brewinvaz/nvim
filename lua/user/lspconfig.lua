@@ -3,27 +3,41 @@ local M = {
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
     {
-      "folke/neodev.nvim",
+      -- neodev.nvim is archived and only hooks the removed `lspconfig`
+      -- framework; lazydev works with `vim.lsp.config`.
+      "folke/lazydev.nvim",
+      ft = "lua",
+      opts = {
+        library = {
+          { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        },
+      },
     },
   },
 }
 
 local function lsp_keymaps(bufnr)
-  local opts = { noremap = true, silent = true }
-  local keymap = vim.api.nvim_buf_set_keymap
+  local opts = { noremap = true, silent = true, buffer = bufnr }
+  local keymap = vim.keymap.set
 
-  keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-  keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-  keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-  keymap(bufnr, "n", "gI", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-  keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-  keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+  keymap("n", "gD", vim.lsp.buf.declaration, opts)
+  keymap("n", "gd", vim.lsp.buf.definition, opts)
+  -- `vim.lsp.with()` is deprecated; pass the border to the buf function instead
+  keymap("n", "K", function()
+    vim.lsp.buf.hover { border = "rounded" }
+  end, opts)
+  keymap("n", "gI", vim.lsp.buf.implementation, opts)
+  keymap("n", "gr", vim.lsp.buf.references, opts)
+  keymap("n", "gs", function()
+    vim.lsp.buf.signature_help { border = "rounded" }
+  end, opts)
+  keymap("n", "gl", vim.diagnostic.open_float, opts)
 end
 
 M.on_attach = function(client, bufnr)
   lsp_keymaps(bufnr)
 
-  if client.supports_method "textDocument/inlayHint" then
+  if client:supports_method "textDocument/inlayHint" then
     -- disable hints on_attach
     vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
   end
@@ -54,26 +68,24 @@ function M.config()
       desc = "Format",
     },
     { "<leader>li", "<cmd>LspInfo<cr>", desc = "Info" },
-    { "<leader>lj", "<cmd>lua vim.diagnostic.goto_next()<CR>", desc = "Next Diagnostic" },
+    { "<leader>lj", "<cmd>lua vim.diagnostic.jump({ count = 1, float = true })<CR>", desc = "Next Diagnostic" },
     { "<leader>lh", "<cmd>lua require('user.lspconfig').toggle_inlay_hints()<CR>", desc = "Hints" },
-    { "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev()<CR>", desc = "Prev Diagnostic" },
+    { "<leader>lk", "<cmd>lua vim.diagnostic.jump({ count = -1, float = true })<CR>", desc = "Prev Diagnostic" },
     { "<leader>ll", "<cmd>lua vim.lsp.codelens.run()<CR>", desc = "CodeLens Action" },
     { "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<CR>", desc = "Quickfix" },
     { "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<CR>", desc = "Rename" },
   }
 
-  local lspconfig = require "lspconfig"
   local servers = require "user.lspservers"
   local icons = require "user.icons"
 
   local default_diagnostic_config = {
     signs = {
-      active = true,
-      values = {
-        { name = "DiagnosticSignError", text = icons.diagnostics.Error },
-        { name = "DiagnosticSignWarn", text = icons.diagnostics.Warning },
-        { name = "DiagnosticSignHint", text = icons.diagnostics.Hint },
-        { name = "DiagnosticSignInfo", text = icons.diagnostics.Information },
+      text = {
+        [vim.diagnostic.severity.ERROR] = icons.diagnostics.Error,
+        [vim.diagnostic.severity.WARN] = icons.diagnostics.Warning,
+        [vim.diagnostic.severity.HINT] = icons.diagnostics.Hint,
+        [vim.diagnostic.severity.INFO] = icons.diagnostics.Information,
       },
     },
     virtual_text = false,
@@ -84,7 +96,7 @@ function M.config()
       focusable = true,
       style = "minimal",
       border = "rounded",
-      source = "always",
+      source = true,
       header = "",
       prefix = "",
     },
@@ -92,36 +104,25 @@ function M.config()
 
   vim.diagnostic.config(default_diagnostic_config)
 
-  -- Sign definition is now handled automatically by vim.diagnostic.config()
-
-  vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-  vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
-
-  require("lspconfig.ui.windows").default_options.border = "rounded"
-
   for _, server in pairs(servers) do
     -- Skip ts_ls since we're using typescript-tools
-    if server == "ts_ls" then
-      goto continue
+    if server ~= "ts_ls" then
+      local opts = {
+        on_attach = M.on_attach,
+        capabilities = M.common_capabilities(),
+      }
+
+      local require_ok, settings = pcall(require, "user.lspsettings." .. server)
+
+      if require_ok then
+        opts = vim.tbl_deep_extend("force", settings, opts)
+      end
+
+      -- `require("lspconfig")` is deprecated: nvim-lspconfig now only ships
+      -- `lsp/<server>.lua` defaults that these calls extend and turn on.
+      vim.lsp.config(server, opts)
+      vim.lsp.enable(server)
     end
-
-    local opts = {
-      on_attach = M.on_attach,
-      capabilities = M.common_capabilities(),
-    }
-
-    local require_ok, settings = pcall(require, "user.lspsettings." .. server)
-
-    if require_ok then
-      opts = vim.tbl_deep_extend("force", settings, opts)
-    end
-
-    if server == "lua_ls" then
-      require("neodev").setup {}
-    end
-
-    lspconfig[server].setup(opts)
-    ::continue::
   end
 end
 

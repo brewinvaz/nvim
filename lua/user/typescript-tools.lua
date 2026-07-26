@@ -16,11 +16,10 @@ return {
       },
     },
     config = function(_, opts)
-      -- Disable ts_ls to avoid conflicts
-      require("lspconfig").ts_ls.setup({
-        autostart = false,
-      })
-      
+      -- Disable ts_ls to avoid conflicts (e.g. if mason-lspconfig auto-enables it)
+      vim.lsp.enable("ts_ls", false)
+
+
       require("typescript-tools").setup(opts)
       
       vim.api.nvim_create_autocmd("LspAttach", {
